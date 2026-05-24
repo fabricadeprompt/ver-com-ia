@@ -470,10 +470,13 @@
     setTimeout(() => flash.classList.remove('on'), 120);
     if (navigator.vibrate) navigator.vibrate(60);
 
-    canvas.width  = video.videoWidth  || 640;
-    canvas.height = video.videoHeight || 480;
-    canvas.getContext('2d').drawImage(video, 0, 0);
-    const imgBase64 = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+    const MAX_WIDTH = 640;
+    const MAX_HEIGHT = 480;
+    const ratio = Math.min(MAX_WIDTH / (video.videoWidth || 640), MAX_HEIGHT / (video.videoHeight || 480));
+    canvas.width  = Math.round((video.videoWidth  || 640) * ratio);
+    canvas.height = Math.round((video.videoHeight || 480) * ratio);
+    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+    const imgBase64 = canvas.toDataURL('image/jpeg', 0.7).split(',')[1];
 
     try {
       const res = await fetch(`${BACKEND_URL}/descrever`, {
